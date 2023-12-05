@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Study App</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin: 50px;
+      }
+      #flashcard {
+        border: 1px solid #ccc;
+        padding: 20px;
+        width: 300px;
+        margin: 0 auto;
+        cursor: pointer;
+        font-size: 12px;
+     
+        
+      }
+      button {
+        margin-top: 10px;
+      }
+      form {
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="flashcard" onclick="toggleAnswer()">
+      <h2 id="question">Question</h2>
+      <h3 id="answer" style="display: none">Answer</h3>
+    </div>
+    <button onclick="showAnswer()">Show Answer</button>
+    <button onclick="backCard()">Go back 1</button>
+    <button onclick="nextCard()">Next Card</button>
+    <button onclick="deleteCard()">Delete Card</button>
+
+    <form id="flashcardForm" onsubmit="addCustomCard(event)">
+      <label for="customQuestion">Custom Question:</label>
+      <input type="text" id="customQuestion" required />
+
+      <label for="customAnswer">Custom Answer:</label>
+      <input type="text" id="customAnswer" required />
+
+      <button type="submit">Add Custom Flashcard</button>
+    </form>
+
+    <script>
+      let flashcards = JSON.parse(localStorage.getItem("flashcards")) || [];
+
+      let currentCard = 0;
+
+      function toggleAnswer() {
+        const answerElement = document.getElementById("answer");
+        answerElement.style.display =
+          answerElement.style.display === "none" ? "block" : "none";
+      }
+
+      function showAnswer() {
+        document.getElementById("answer").style.display = "block";
+      }
+
+      function backCard() {
+        currentCard = (currentCard - 1 + flashcards.length) % flashcards.length;
+        displayCurrentCard();
+      }
+
+      function nextCard() {
+        currentCard = (currentCard + 1) % flashcards.length;
+        displayCurrentCard();
+      }
+
+      function deleteCard() {
+        // Remove the current card from the array
+        flashcards.splice(currentCard, 1);
+
+        // Adjust the current card index if necessary
+        if (currentCard >= flashcards.length) {
+          currentCard = flashcards.length - 1;
+        }
+
+        displayCurrentCard();
+
+        // Save the updated flashcards to localStorage
+        localStorage.setItem("flashcards", JSON.stringify(flashcards));
+      }
+
+      function addCustomCard(event) {
+        event.preventDefault();
+
+        const customQuestion = document.getElementById("customQuestion").value;
+        const customAnswer = document.getElementById("customAnswer").value;
+
+        flashcards.push({ question: customQuestion, answer: customAnswer });
+
+        document.getElementById("customQuestion").value = "";
+        document.getElementById("customAnswer").value = "";
+
+        currentCard = flashcards.length - 1;
+        displayCurrentCard();
+
+        // Save the flashcards to localStorage
+        localStorage.setItem("flashcards", JSON.stringify(flashcards));
+      }
+
+      function displayCurrentCard() {
+        document.getElementById("question").innerText =
+          flashcards[currentCard].question;
+        document.getElementById("answer").innerText =
+          flashcards[currentCard].answer;
+        document.getElementById("answer").style.display = "none";
+      }
+
+      // Display the first card on page load
+      displayCurrentCard();
+    </script>
+  </body>
+</html>
