@@ -8,9 +8,18 @@ interface Flashcard {
 
 const Flashcards: React.FC = () => {
   const [flashcards, setFlashcards] = useState<Flashcard[]>(() => {
-    const savedFlashcards = localStorage.getItem("flashcards");
-    return savedFlashcards ? JSON.parse(savedFlashcards) : [];
+    if (typeof window !== "undefined") {
+      const savedFlashcards = localStorage.getItem("flashcards");
+      return savedFlashcards ? JSON.parse(savedFlashcards) : [];
+    }
+    return [];
   });
+  useEffect(() => {
+    const savedFlashcards = localStorage.getItem("flashcards");
+    if (savedFlashcards) {
+      setFlashcards(JSON.parse(savedFlashcards));
+    }
+  }, []);
   const [currentCard, setCurrentCard] = useState<number>(0);
   const [showAnswer, setShowAnswer] = useState<boolean>(false);
   const [customQuestion, setCustomQuestion] = useState<string>("");
